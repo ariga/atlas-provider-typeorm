@@ -1,6 +1,6 @@
 #! /usr/bin/env ts-node-script
 
-import { Dialect, loadEntities } from "../src/load";
+import { Dialect, loadEntities } from "../../src/load";
 import { User } from "./entities/User";
 import { Blog } from "./entities/Blog";
 
