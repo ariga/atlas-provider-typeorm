@@ -1,10 +1,4 @@
-import {
-  DataSource,
-  EntitySchema,
-  Table,
-  TableCheck,
-  TableForeignKey,
-} from "typeorm";
+import { DataSource, EntitySchema, Table, TableForeignKey } from "typeorm";
 import { ConnectionMetadataBuilder } from "typeorm/connection/ConnectionMetadataBuilder";
 import { EntityMetadataValidator } from "typeorm/metadata-builder/EntityMetadataValidator";
 import { View } from "typeorm/schema-builder/view/View";
@@ -13,7 +7,8 @@ export type Dialect = "mysql" | "postgres" | "mariadb" | "sqlite" | "mssql";
 
 export async function loadModels(
   dialect: Dialect,
-  entities: (Function | EntitySchema<any> | string)[]
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  entities: (Function | EntitySchema | string)[]
 ) {
   const mockDB = new DataSource({
     type: dialect,
