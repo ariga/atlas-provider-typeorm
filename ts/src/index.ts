@@ -5,7 +5,7 @@ import { View } from "typeorm/schema-builder/view/View";
 
 export type Dialect = "mysql" | "postgres" | "mariadb" | "sqlite" | "mssql";
 
-export async function loadModels(
+export async function loadEntities(
   dialect: Dialect,
   // eslint-disable-next-line @typescript-eslint/ban-types
   entities: (Function | EntitySchema | string)[]

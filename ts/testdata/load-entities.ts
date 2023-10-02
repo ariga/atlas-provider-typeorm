@@ -1,6 +1,6 @@
 #! /usr/bin/env ts-node-script
 
-import { Dialect, loadModels } from "../src";
+import { Dialect, loadEntities } from "../src";
 import { User } from "./entities/User";
 import { Blog } from "./entities/Blog";
 
@@ -8,6 +8,6 @@ import { Blog } from "./entities/Blog";
 const dialect = process.argv[2] as Dialect;
 
 // print sql after promise is resolver
-loadModels(dialect, [User, Blog]).then((sql) => {
+loadEntities(dialect, [User, Blog]).then((sql) => {
   console.log(sql);
 });

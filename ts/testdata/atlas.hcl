@@ -14,7 +14,7 @@ data "external_schema" "typeorm" {
   program = [
     "npx",
     "ts-node",
-    "load-models.ts",
+    "load-entities.ts",
      var.dialect,
   ]
 }
