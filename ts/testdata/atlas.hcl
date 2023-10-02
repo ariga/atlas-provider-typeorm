@@ -20,7 +20,7 @@ data "external_schema" "typeorm" {
 }
 
 env "typeorm" {
-  src = data.external_schema.sequelize.url
+  src = data.external_schema.typeorm.url
   dev = local.dev_url
   migration {
     dir = "file://migrations/${var.dialect}"
