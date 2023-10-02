@@ -1,10 +1,12 @@
 {
-  "name": "@ariga/ts-atlas-provider-sequelize",
+  "name": "@ariga/ts-atlas-provider-typeorm",
   "description": "Load Typeorm models into an Atlas project.",
   "version": "0.0.1",
   "type": "commonjs",
+  "bin": "src/index.ts",
   "devDependencies": {
     "@types/node": "^16.11.10",
+    "@types/yargs": "^17.0.26",
     "@typescript-eslint/eslint-plugin": "^6.7.3",
     "@typescript-eslint/parser": "^6.7.3",
     "eslint": "^8.50.0",
