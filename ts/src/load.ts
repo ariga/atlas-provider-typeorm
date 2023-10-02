@@ -37,8 +37,7 @@ export async function loadEntities(
     await queryRunner.createTable(table);
   }
 
-  // create foreign keys statements,
-  // executed after all tables created since foreign keys can reference tables that were created afterwards.
+  // creating foreign keys statements are executed after all tables created since foreign keys can reference tables that were created afterwards.
   for (const metadata of entityMetadatas) {
     const table = Table.create(metadata, driver);
     const foreignKeys = metadata.foreignKeys.map((foreignKeyMetadata) =>
@@ -56,11 +55,8 @@ export async function loadEntities(
     await queryRunner.createView(view, false);
   }
 
-  let sql = "";
   const memorySql = queryRunner.getMemorySql();
-  memorySql.upQueries.forEach((query) => {
-    sql += query.query + ";\n";
-  });
+  const queries = memorySql.upQueries.map((query) => query.query);
   queryRunner.clearSqlMemory();
-  return sql;
+  return queries.join(";\n");
 }
