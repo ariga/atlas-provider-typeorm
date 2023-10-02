@@ -29,6 +29,7 @@ jobs:
     strategy:
       matrix:
         dialect: [ mysql, postgres, sqlite ]
+        language: [ ts, js ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -46,7 +47,9 @@ jobs:
         working-directory: ./ts
       - uses: ariga/setup-atlas@master
       - name: Run Test as Standalone
-        working-directory: ./ts/testdata
+        # TODO: remove this when we have a standalone binary for js
+        if: ${{ matrix.language != 'js' }}
+        working-directory: ./ts/testdata/${{ matrix.language }}
         run: |
           atlas migrate diff --env typeorm -c "file://atlas-standalone.hcl" --var dialect=${{ matrix.dialect }}
       - name: Verify migrations generated
@@ -59,7 +62,7 @@ jobs:
             exit 1
            fi
       - name: Run Test as ts Script
-        working-directory: ./ts/testdata
+        working-directory: ./ts/testdata/${{ matrix.language }}
         run: |
           atlas migrate diff --env typeorm -c "file://atlas-script.hcl" --var dialect=${{ matrix.dialect }}
       - name: Verify migrations generated
