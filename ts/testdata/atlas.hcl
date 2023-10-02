@@ -14,13 +14,13 @@ data "external_schema" "typeorm" {
   program = [
     "npx",
     "ts-node",
-    "load-models.ts",
+    "load-entities.ts",
      var.dialect,
   ]
 }
 
 env "typeorm" {
-  src = data.external_schema.sequelize.url
+  src = data.external_schema.typeorm.url
   dev = local.dev_url
   migration {
     dir = "file://migrations/${var.dialect}"
