@@ -7,9 +7,6 @@ on:
 
 jobs:
   lint:
-    strategy:
-      matrix:
-        language: [ ts ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -19,20 +16,19 @@ jobs:
       - name: Cache node modules
         uses: actions/cache@v3
         with:
-          path: ./${{ matrix.language }}/node_modules
+          path: ./ts/node_modules
           key: ${{ runner.os }}-build-${{ hashFiles('**/package-lock.json') }}
           restore-keys: node_modules-
       - name: Install
         run: npm install
-        working-directory: ./${{ matrix.language }}
+        working-directory: ./ts
       - name: Lint check
         run: npm run fmt-check
-        working-directory: ./${{ matrix.language }}
+        working-directory: ./ts
   integration-tests:
     strategy:
       matrix:
         dialect: [ mysql, postgres, sqlite ]
-        language: [ ts ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -42,15 +38,15 @@ jobs:
       - name: Cache node modules
         uses: actions/cache@v3
         with:
-          path: ./${{ matrix.language }}/node_modules
+          path: ./ts/node_modules
           key: ${{ runner.os }}-build-${{ hashFiles('**/package-lock.json') }}
           restore-keys: node_modules-
       - name: Install
         run: npm install
-        working-directory: ./${{ matrix.language }}
+        working-directory: ./ts
       - uses: ariga/setup-atlas@master
       - name: Run Test as Standalone
-        working-directory: ./${{ matrix.language }}/testdata
+        working-directory: ./ts/testdata
         run: |
           atlas migrate diff --env typeorm --var dialect=${{ matrix.dialect }}
       - name: Verify migrations generated
