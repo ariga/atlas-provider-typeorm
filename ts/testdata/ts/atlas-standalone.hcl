@@ -13,7 +13,7 @@ locals {
 data "external_schema" "typeorm" {
   program = [
     "npx",
-    "../",
+    "../..",
     "load",
     "--path", "./entities",
     "--dialect", var.dialect,

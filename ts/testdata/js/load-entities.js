@@ -1,6 +1,6 @@
 #! /usr/bin/env node
 
-const loadEntities = require("../../src/load").loadEntities;
+const loadEntities = require("../../dist/load").loadEntities;
 const EntitySchema = require("typeorm").EntitySchema;
 
 // parse the second argument as the dialect

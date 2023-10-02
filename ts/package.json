@@ -23,8 +23,8 @@
     "typeorm": "0.3.17"
   },
   "scripts": {
-    "fmt": "eslint src/**.ts --fix && prettier --write .",
-    "fmt-check": "eslint src/**.ts --max-warnings=0 && prettier --check .",
-    "build": "tsc -d src/load.ts"
+    "fmt": "eslint src/**.ts --fix && prettier --write src/**.ts",
+    "fmt-check": "eslint src/**.ts --max-warnings=0 && prettier --check src/**.ts",
+    "build": "tsc -d src/load.ts --outDir dist"
   }
 }
