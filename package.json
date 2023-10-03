@@ -1,5 +1,5 @@
 {
-  "name": "@ariga/ts-atlas-provider-typeorm",
+  "name": "@ariga/atlas-provider-typeorm",
   "description": "Load Typeorm models into an Atlas project.",
   "version": "0.0.1",
   "type": "commonjs",
