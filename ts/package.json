@@ -25,6 +25,6 @@
   "scripts": {
     "fmt": "eslint src/**.ts --fix && prettier --write src/**.ts",
     "fmt-check": "eslint src/**.ts --max-warnings=0 && prettier --check src/**.ts",
-    "build": "tsc -d src/load.ts --outDir dist"
+    "build": "tsc -d src/load.ts --outDir build"
   }
 }
