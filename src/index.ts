@@ -1,17 +1,19 @@
-#!/usr/bin/env ts-node-script
+#!/usr/bin/env -S ts-node --swc
 
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 import { Dialect, loadEntities } from "./load";
 import * as fs from "fs";
 import { EntitySchema } from "typeorm";
+import { resolve } from "path";
 
 const loadJSEntities = async (dialect: Dialect, path: string) => {
-  const files = fs.readdirSync(path);
+  const absolutePath = resolve(path);
+  const files = fs.readdirSync(absolutePath);
   const entities: EntitySchema[] = [];
   for (const file of files) {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const entity = new EntitySchema(require(`${path}/${file}`));
+    const entity = new EntitySchema(require(`${absolutePath}/${file}`));
     entities.push(entity);
   }
   return await loadEntities(dialect as Dialect, entities);

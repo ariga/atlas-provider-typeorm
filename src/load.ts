@@ -39,6 +39,9 @@ export async function loadEntities(
 
   // Creating foreign keys statements are executed after all tables created since foreign keys can reference tables that were created afterwards.
   for (const metadata of entityMetadatas) {
+    if (metadata.tableType === "view") {
+      continue;
+    }
     const table = Table.create(metadata, driver);
     const foreignKeys = metadata.foreignKeys.map((foreignKeyMetadata) =>
       TableForeignKey.create(foreignKeyMetadata, driver),
