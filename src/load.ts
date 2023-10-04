@@ -37,7 +37,7 @@ export async function loadEntities(
     await queryRunner.createTable(table);
   }
 
-  // creating foreign keys statements are executed after all tables created since foreign keys can reference tables that were created afterwards.
+  // Creating foreign keys statements are executed after all tables created since foreign keys can reference tables that were created afterwards.
   for (const metadata of entityMetadatas) {
     const table = Table.create(metadata, driver);
     const foreignKeys = metadata.foreignKeys.map((foreignKeyMetadata) =>

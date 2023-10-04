@@ -23,9 +23,8 @@
     "typeorm": "0.3.17"
   },
   "scripts": {
-    "start": "ts-node src/index.ts",
-    "typeorm": "typeorm-ts-node-commonjs",
-    "fmt": "eslint src/**.ts --fix && prettier --write .",
-    "fmt-check": "eslint src/**.ts --max-warnings=0 && prettier --check ."
+    "fmt": "eslint src/**.ts --fix && prettier --write src/**.ts",
+    "fmt-check": "eslint src/**.ts --max-warnings=0 && prettier --check src/**.ts",
+    "build": "tsc -d src/load.ts --outDir build"
   }
 }
