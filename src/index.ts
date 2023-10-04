@@ -1,4 +1,4 @@
-#! /usr/bin/env ts-node-script
+#!/usr/bin/env ts-node-script
 
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";

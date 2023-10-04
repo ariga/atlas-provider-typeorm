@@ -1,4 +1,4 @@
-#! /usr/bin/env ts-node-script
+#!/usr/bin/env ts-node-script
 
 import { Dialect, loadEntities } from "../../src/load";
 import { User } from "./entities/User";
