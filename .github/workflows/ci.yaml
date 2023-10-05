@@ -23,6 +23,17 @@ jobs:
         run: npm install
       - name: Lint check
         run: npm run fmt-check
+      - name: Build Typescript Files
+        run: npm run build
+      - name: Verify TypeScript files Built
+        run: |
+          status=$(git status --porcelain)
+          if [ -n "$status" ]; then
+            echo "you need to run 'npm run build' and commit the changes"
+            echo "$status"
+            git --no-pager diff
+            exit 1
+          fi
   integration-tests:
     strategy:
       matrix:
@@ -42,8 +53,6 @@ jobs:
           restore-keys: node_modules-
       - name: Install
         run: npm install
-      - name: Build Typescript Files
-        run: npm run build
       - uses: ariga/setup-atlas@master
       - name: Run Test as Standalone
         working-directory: ./testdata/${{ matrix.language }}
