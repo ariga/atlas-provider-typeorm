@@ -46,8 +46,6 @@ jobs:
         run: npm run build
       - uses: ariga/setup-atlas@master
       - name: Run Test as Standalone
-        # TODO: remove this when we have a standalone binary for js
-        if: ${{ matrix.language != 'js' }}
         working-directory: ./testdata/${{ matrix.language }}
         run: |
           atlas migrate diff --env typeorm -c "file://atlas-standalone.hcl" --var dialect=${{ matrix.dialect }}
