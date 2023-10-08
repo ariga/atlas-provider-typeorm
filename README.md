@@ -2,11 +2,11 @@
 
 ![CI](https://github.com/ariga/atlas-provider-typeorm/actions/workflows/ci.yaml/badge.svg)
 
-Load [Typeorm](https://typeorm.io/) entities into an [Atlas](https://atlasgo.io) project.
+Load [TypeORM](https://typeorm.io/) entities into an [Atlas](https://atlasgo.io) project.
 
 ## Use-cases
-1. **Declarative migrations** - use a Terraform-like `atlas schema apply --env typeorm` to apply your Typeorm entities to the database.
-2. **Automatic migration planning** - use `atlas migrate diff --env typeorm` to automatically plan a migration from the current database version to the Typeorm schema.
+1. **Declarative migrations** - use a Terraform-like `atlas schema apply --env typeorm` to apply your TypeORM entities to the database.
+2. **Automatic migration planning** - use `atlas migrate diff --env typeorm` to automatically plan a migration from the current database version to the TypeORM schema.
 
 ## Installation
 
@@ -28,8 +28,8 @@ npm i
 
 ### Standalone 
 
-If all of your Typeorm entities exist in a single Node module, 
-you can use the provider directly to load your Typeorm schema into Atlas.
+If all of your TypeORM entities exist in a single Node module, 
+you can use the provider directly to load your TypeORM schema into Atlas.
 
 In your project directory, create a new file named `atlas.hcl` with the following contents:
 
@@ -128,14 +128,14 @@ env "typeorm" {
 
 ## Usage
 
-Once you have the provider installed, you can use it to apply your Typeorm schema to the database:
+Once you have the provider installed, you can use it to apply your TypeORM schema to the database:
 
 
 ### Apply
 
-You can use the `atlas schema apply` command to plan and apply a migration of your current Typeorm schema
+You can use the `atlas schema apply` command to plan and apply a migration of your current TypeORM schema
 to your database. This works by inspecting the target database and comparing it to the
-Typeorm schema and creating a migration plan. Atlas will prompt you to confirm the migration plan
+TypeORM schema and creating a migration plan. Atlas will prompt you to confirm the migration plan
 before applying it to the database.
 
 ```bash
@@ -149,7 +149,7 @@ target database.
 Atlas supports a [version migration](https://atlasgo.io/concepts/declarative-vs-versioned#versioned-migrations) 
 workflow, where each change to the database is versioned and recorded in a migration file. You can use the
 `atlas migrate diff` command to automatically generate a migration file that will migrate the database
-from its latest revision to the current Typeorm schema.
+from its latest revision to the current TypeORM schema.
 
 ```bash
 atlas migrate diff --env typeorm 
