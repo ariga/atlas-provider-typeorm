@@ -9,12 +9,6 @@ import {
 } from "typeorm";
 import { Blog } from "./Blog";
 
-export enum UserRole {
-  ADMIN = "admin",
-  EDITOR = "editor",
-  GHOST = "ghost",
-}
-
 @Entity()
 @Unique(["firstName", "lastName"])
 @Check(`"age" > 6`)
@@ -27,13 +21,6 @@ export class User {
 
   @Column()
   lastName: string;
-
-  @Column({
-    type: "enum",
-    enum: UserRole,
-    default: UserRole.GHOST,
-  })
-  role: UserRole;
 
   @Column()
   @Index("IDX_USER_AGE")
