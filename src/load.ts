@@ -2,6 +2,7 @@ import { DataSource, EntitySchema, Table, TableForeignKey } from "typeorm";
 import { ConnectionMetadataBuilder } from "typeorm/connection/ConnectionMetadataBuilder";
 import { EntityMetadataValidator } from "typeorm/metadata-builder/EntityMetadataValidator";
 import { View } from "typeorm/schema-builder/view/View";
+import { PostgresQueryRunner } from "typeorm/driver/postgres/PostgresQueryRunner";
 
 export type Dialect = "mysql" | "postgres" | "mariadb" | "sqlite" | "mssql";
 
@@ -28,10 +29,35 @@ export async function loadEntities(
     driver,
   );
 
+  const mockPostgresQueryRunner = (schema?: string) => {
+    // mock postgres query runner for enum checks
+    const postgresQueryRunner = queryRunner as PostgresQueryRunner;
+    const enumNames = new Set<string>();
+    postgresQueryRunner.query = async (query: string) => {
+      if (query.includes("SELECT * FROM current_schema()")) {
+        return [{ current_schema: schema }];
+      }
+      if (
+        query.includes('SELECT "n"."nspname", "t"."typname" FROM "pg_type" "t"')
+      ) {
+        if (enumNames.has(query)) {
+          // mock result for enum that already exists
+          return [{}];
+        }
+        enumNames.add(query);
+        // mock result for enum that does not exist
+        return [];
+      }
+    };
+  };
+
   // create tables statements
   for (const metadata of entityMetadatas) {
     if (metadata.tableType === "view") {
       continue;
+    }
+    if (dialect === "postgres") {
+      mockPostgresQueryRunner(metadata.schema);
     }
     const table = Table.create(metadata, driver);
     await queryRunner.createTable(table);
