@@ -15,7 +15,7 @@ data "external_schema" "typeorm" {
     "npx",
     "../..",
     "load",
-    "--path", "./entities",
+    "--path", var.dialect == "sqlite" ? "./entities/sqlite" : "./entities",
     "--dialect", var.dialect,
   ]
 }

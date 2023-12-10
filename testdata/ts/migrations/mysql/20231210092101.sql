@@ -3,6 +3,7 @@ CREATE TABLE `user` (
   `id` int NOT NULL AUTO_INCREMENT,
   `firstName` varchar(255) NOT NULL,
   `lastName` varchar(255) NOT NULL,
+  `role` enum('admin','editor','ghost') NOT NULL DEFAULT "ghost",
   `age` int NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `IDX_c322cd2084cd4b1b2813a90032` (`firstName`, `lastName`),

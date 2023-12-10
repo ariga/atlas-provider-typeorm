@@ -1,8 +1,11 @@
+-- Create enum type "user_role_enum"
+CREATE TYPE "public"."user_role_enum" AS ENUM ('admin', 'editor', 'ghost');
 -- Create "user" table
 CREATE TABLE "public"."user" (
   "id" serial NOT NULL,
   "firstName" character varying NOT NULL,
   "lastName" character varying NOT NULL,
+  "role" "public"."user_role_enum" NOT NULL DEFAULT 'ghost',
   "age" integer NOT NULL,
   PRIMARY KEY ("id"),
   CONSTRAINT "CHK_70c8a9c9c39b98f399c28b8700" CHECK (age > 6)
