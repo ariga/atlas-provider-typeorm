@@ -46,7 +46,8 @@ function loadEntities(dialect,
 // eslint-disable-next-line @typescript-eslint/ban-types
 entities) {
     return __awaiter(this, void 0, void 0, function () {
-        var mockDB, driver, metadataBuilder, entityMetadataValidator, queryRunner, entityMetadatas, _i, entityMetadatas_1, metadata, table, _a, entityMetadatas_2, metadata, table, foreignKeys, _b, entityMetadatas_3, metadata, view, memorySql, queries;
+        var mockDB, driver, metadataBuilder, entityMetadataValidator, queryRunner, entityMetadatas, mockPostgresQueryRunner, _i, entityMetadatas_1, metadata, table, _a, entityMetadatas_2, metadata, table, foreignKeys, _b, entityMetadatas_3, metadata, view, memorySql, queries;
+        var _this = this;
         return __generator(this, function (_c) {
             switch (_c.label) {
                 case 0:
@@ -64,6 +65,27 @@ entities) {
                     entityMetadatas = _c.sent();
                     // validate all created entity metadatas to make sure user created entities are valid and correct
                     entityMetadataValidator.validateMany(entityMetadatas.filter(function (metadata) { return metadata.tableType !== "view"; }), driver);
+                    mockPostgresQueryRunner = function (schema) {
+                        var postgresQueryRunner = queryRunner;
+                        var enumQueries = new Set();
+                        postgresQueryRunner.query = function (query) { return __awaiter(_this, void 0, void 0, function () {
+                            return __generator(this, function (_a) {
+                                if (query.includes("SELECT * FROM current_schema()")) {
+                                    return [2 /*return*/, [{ current_schema: schema }]];
+                                }
+                                if (query.includes('SELECT "n"."nspname", "t"."typname" FROM "pg_type" "t"')) {
+                                    if (enumQueries.has(query)) {
+                                        // mock result for enum that already exists
+                                        return [2 /*return*/, [{}]];
+                                    }
+                                    enumQueries.add(query);
+                                    // mock result for enum that does not exist
+                                    return [2 /*return*/, []];
+                                }
+                                return [2 /*return*/];
+                            });
+                        }); };
+                    };
                     _i = 0, entityMetadatas_1 = entityMetadatas;
                     _c.label = 2;
                 case 2:
@@ -71,6 +93,9 @@ entities) {
                     metadata = entityMetadatas_1[_i];
                     if (metadata.tableType === "view") {
                         return [3 /*break*/, 4];
+                    }
+                    if (dialect === "postgres") {
+                        mockPostgresQueryRunner(metadata.schema);
                     }
                     table = typeorm_1.Table.create(metadata, driver);
                     return [4 /*yield*/, queryRunner.createTable(table)];

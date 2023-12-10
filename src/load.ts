@@ -29,10 +29,10 @@ export async function loadEntities(
     driver,
   );
 
+  // mockPostgresQueryRunner used to mock result of queries instead of executing them against the database.
   const mockPostgresQueryRunner = (schema?: string) => {
-    // mock postgres query runner for enum checks
     const postgresQueryRunner = queryRunner as PostgresQueryRunner;
-    const enumNames = new Set<string>();
+    const enumQueries = new Set<string>();
     postgresQueryRunner.query = async (query: string) => {
       if (query.includes("SELECT * FROM current_schema()")) {
         return [{ current_schema: schema }];
@@ -40,11 +40,11 @@ export async function loadEntities(
       if (
         query.includes('SELECT "n"."nspname", "t"."typname" FROM "pg_type" "t"')
       ) {
-        if (enumNames.has(query)) {
+        if (enumQueries.has(query)) {
           // mock result for enum that already exists
           return [{}];
         }
-        enumNames.add(query);
+        enumQueries.add(query);
         // mock result for enum that does not exist
         return [];
       }
