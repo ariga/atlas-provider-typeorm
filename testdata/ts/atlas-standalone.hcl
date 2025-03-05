@@ -6,6 +6,7 @@ locals {
   dev_url = {
     mysql = "docker://mysql/8/dev"
     postgres = "docker://postgres/15"
+    mssql = "docker://sqlserver/2022-latest"
     sqlite = "sqlite://file::memory:?cache=shared"
   }[var.dialect]
 }
@@ -15,7 +16,8 @@ data "external_schema" "typeorm" {
     "npx",
     "../..",
     "load",
-    "--path", var.dialect == "sqlite" ? "./entities/sqlite" : "./entities",
+    "--path", var.dialect == "sqlite" ? "./entities/sqlite" :
+      var.dialect == "mssql" ? "./entities/mssql": "./entities",
     "--dialect", var.dialect,
   ]
 }
