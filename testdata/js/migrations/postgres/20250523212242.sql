@@ -3,19 +3,19 @@ CREATE TABLE "public"."post" (
   "id" serial NOT NULL,
   "title" character varying NOT NULL,
   "text" text NOT NULL,
-  PRIMARY KEY ("id")
+  CONSTRAINT "PK_be5fda3aac270b134ff9c21cdee" PRIMARY KEY ("id")
 );
 -- Create "category" table
 CREATE TABLE "public"."category" (
   "id" serial NOT NULL,
   "name" character varying NOT NULL,
-  PRIMARY KEY ("id")
+  CONSTRAINT "PK_9c4e4a89e3674fc9f382d733f03" PRIMARY KEY ("id")
 );
 -- Create "post_categories_category" table
 CREATE TABLE "public"."post_categories_category" (
   "postId" integer NOT NULL,
   "categoryId" integer NOT NULL,
-  PRIMARY KEY ("postId", "categoryId"),
+  CONSTRAINT "PK_91306c0021c4901c1825ef097ce" PRIMARY KEY ("postId", "categoryId"),
   CONSTRAINT "FK_93b566d522b73cb8bc46f7405bd" FOREIGN KEY ("postId") REFERENCES "public"."post" ("id") ON UPDATE CASCADE ON DELETE CASCADE,
   CONSTRAINT "FK_a5e63f80ca58e7296d5864bd2d3" FOREIGN KEY ("categoryId") REFERENCES "public"."category" ("id") ON UPDATE CASCADE ON DELETE CASCADE
 );
