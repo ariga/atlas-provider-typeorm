@@ -82,15 +82,20 @@ entities) {
         }
         // Get line:column range of a class in a file using ts-morph
         function getEntityPositionWithRange(filePath, className) {
-            const project = new ts_morph_1.Project();
             try {
+                const project = new ts_morph_1.Project({
+                    compilerOptions: { allowJs: true },
+                    skipAddingFilesFromTsConfig: true,
+                });
                 const sourceFile = project.addSourceFileAtPath(filePath);
+                if (!sourceFile)
+                    return undefined;
                 const cls = sourceFile.getClass(className);
                 if (!cls)
-                    return;
+                    return undefined;
                 const nameNode = cls.getNameNode();
                 if (!nameNode)
-                    return;
+                    return undefined;
                 const startPos = nameNode.getPos();
                 const endPos = cls.getEnd();
                 const start = sourceFile.getLineAndColumnAtPos(startPos);
