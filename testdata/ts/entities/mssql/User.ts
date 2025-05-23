@@ -26,6 +26,6 @@ export class User {
   @Index("IDX_USER_AGE")
   age: number;
 
-  @OneToMany(() => Blog, (blog) => blog.user)
+  @OneToMany('Blog', 'user')
   blogs: Blog[];
 }

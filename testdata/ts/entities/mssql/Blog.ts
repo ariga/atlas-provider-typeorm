@@ -9,6 +9,6 @@ export class Blog {
   @Column()
   title: string;
 
-  @ManyToOne(() => User, (user) => user.blogs)
+  @ManyToOne('User', 'blogs')
   user: User;
 }
