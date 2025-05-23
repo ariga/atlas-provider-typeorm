@@ -34,6 +34,27 @@ jobs:
             git --no-pager diff
             exit 1
           fi
+  unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.14.0
+      - name: Cache node modules
+        uses: actions/cache@v3
+        with:
+          path: ./node_modules
+          key: ${{ runner.os }}-build-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: node_modules-
+      - name: Install
+        run: npm install
+      - name: Build
+        run: npm run build
+      - name: Run test:load-ts
+        run: npm run test:load-ts
+      - name: Run test:load-js
+        run: npm run test:load-js
   integration-tests:
     strategy:
       matrix:
