@@ -29,7 +29,6 @@
     "fmt": "eslint src/**.ts --fix && prettier --write src/**.ts",
     "fmt-check": "eslint src/**.ts --max-warnings=0 && prettier --check src/**.ts",
     "build": "tsc --project tsconfig.json",
-    "test:load-js": "ts-node testdata/js/load-entities.test.js",
-    "test:load-ts": "ts-node testdata/ts/load-entities.test.ts"
+    "test": "bash load-test.sh"
   }
 }

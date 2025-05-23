@@ -113,8 +113,10 @@ entities) {
             const name = metadata.tableName;
             const target = metadata.target;
             const filePath = Object.keys(require.cache).find((p) => {
-                const exports = require.cache[p].exports;
-                return Object.values(exports).includes(target);
+                const cached = require.cache[p];
+                if (!cached || typeof cached.exports !== "object" || !cached.exports)
+                    return false;
+                return Object.values(cached.exports).includes(target);
             });
             if (!filePath)
                 continue;
