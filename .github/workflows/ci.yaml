@@ -51,6 +51,20 @@ jobs:
           path: ./node_modules
           key: ${{ runner.os }}-build-${{ hashFiles('**/package-lock.json') }}
           restore-keys: node_modules-
+      - name: Run and verify load output
+        working-directory: ./testdata/${{ matrix.language }}
+        run: |
+          if [ "${{ matrix.language }}" = "ts" ]; then
+            npx ts-node load-entities.ts ${{ matrix.dialect }} > actual-schema.sql
+          else
+            node load-entities.js ${{ matrix.dialect }} > actual-schema.sql
+          fi
+          diff -u -b output/${{ matrix.dialect }}/schema.sql actual-schema.sql || (
+            echo "Schema output does not match expected file." && exit 1
+          )
+      - name: Cleanup temp file
+        working-directory: ./testdata/${{ matrix.language }}
+        run: rm -f actual-schema.sql
       - name: Install
         run: npm install
       - uses: ariga/setup-atlas@master

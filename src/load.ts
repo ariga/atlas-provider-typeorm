@@ -1,3 +1,5 @@
+import * as path from "path";
+import { Project } from "ts-morph";
 import { DataSource, EntitySchema, Table, TableForeignKey } from "typeorm";
 import { ConnectionMetadataBuilder } from "typeorm/connection/ConnectionMetadataBuilder";
 import { EntityMetadataValidator } from "typeorm/metadata-builder/EntityMetadataValidator";
@@ -84,8 +86,59 @@ export async function loadEntities(
     await queryRunner.createView(view, false);
   }
 
+  // Get line:column range of a class in a file using ts-morph
+  function getEntityPositionWithRange(
+    filePath: string,
+    className: string,
+  ): string | undefined {
+    try {
+      const project = new Project({
+        compilerOptions: { allowJs: true },
+        skipAddingFilesFromTsConfig: true,
+      });
+      const sourceFile = project.addSourceFileAtPath(filePath);
+      if (!sourceFile) return undefined;
+      const cls = sourceFile.getClass(className);
+      if (!cls) return undefined;
+      const nameNode = cls.getNameNode();
+      if (!nameNode) return undefined;
+      const startPos = nameNode.getPos();
+      const endPos = cls.getEnd();
+      const start = sourceFile.getLineAndColumnAtPos(startPos);
+      const end = sourceFile.getLineAndColumnAtPos(endPos);
+      return `${filePath}:${start.line}:${start.column}-${end.line}:${end.column}`;
+    } catch {
+      return undefined;
+    }
+  }
+
+  // Build atlas:pos directives
+  const directives: string[] = [];
+  for (const metadata of entityMetadatas) {
+    const type = metadata.tableType === "view" ? "view" : "table";
+    const name = metadata.tableName;
+    const target = metadata.target;
+    const filePath = Object.keys(require.cache).find((p) => {
+      const cached = require.cache[p];
+      if (!cached || typeof cached.exports !== "object" || !cached.exports)
+        return false;
+      return Object.values(cached.exports).includes(target);
+    });
+    if (!filePath) continue;
+    const relative = path.relative(process.cwd(), filePath);
+    let pos = relative;
+    if (typeof target === "function") {
+      const className = target.name;
+      const fullPos = getEntityPositionWithRange(filePath, className);
+      if (fullPos) {
+        pos = fullPos.replace(filePath, relative);
+      }
+    }
+    directives.push(`-- atlas:pos ${name}[type=${type}] ${pos}`);
+  }
+
   const memorySql = queryRunner.getMemorySql();
   const queries = memorySql.upQueries.map((query) => query.query);
   queryRunner.clearSqlMemory();
-  return queries.join(";\n");
+  return `${directives.sort().join("\n")}\n\n${queries.join(";\n")}`;
 }

@@ -7,7 +7,7 @@ locals {
     mysql = "docker://mysql/8/dev"
     postgres = "docker://postgres/15"
     mssql = "docker://sqlserver/2022-latest"
-    sqlite = "sqlite://file::memory:?cache=shared"
+    sqlite = "sqlite://file::memory:"
   }[var.dialect]
 }
 
