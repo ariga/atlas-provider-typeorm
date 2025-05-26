@@ -51,6 +51,9 @@ jobs:
           path: ./node_modules
           key: ${{ runner.os }}-build-${{ hashFiles('**/package-lock.json') }}
           restore-keys: node_modules-
+      - name: Install
+        run: npm install
+      - uses: ariga/setup-atlas@master
       - name: Run and verify load output
         working-directory: ./testdata/${{ matrix.language }}
         run: |
@@ -65,9 +68,6 @@ jobs:
       - name: Cleanup temp file
         working-directory: ./testdata/${{ matrix.language }}
         run: rm -f actual-schema.sql
-      - name: Install
-        run: npm install
-      - uses: ariga/setup-atlas@master
       - name: Run Test as Standalone
         working-directory: ./testdata/${{ matrix.language }}
         run: |
