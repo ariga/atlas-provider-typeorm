@@ -25,6 +25,11 @@ y.command(
       demandOption: true,
       describe: "Dialect of database",
     },
+    includeSubdirs: {
+      type: "boolean",
+      default: false,
+      describe: "Whether to include all subfolders when resolving entity files",
+    },
   },
   async function (argv) {
     try {
@@ -32,9 +37,10 @@ y.command(
       if (!fs.existsSync(path)) {
         throw new Error(`path ${path} does not exist`);
       }
-      const sql = await loadEntities(argv.dialect as Dialect, [
-        path + "/**/*.{ts,js}",
-      ]);
+      const pattern = argv.includeSubdirs
+          ? `${argv.path}/**/*.{ts,js}`
+          : `${argv.path}/*.{ts,js}`;
+      const sql = await loadEntities(argv.dialect as Dialect, [pattern]);
       console.log(sql);
     } catch (e) {
       if (e instanceof Error) {

@@ -5,7 +5,7 @@ const loadEntities = require("../../build/load").loadEntities;
 // parse the second argument as the dialect
 const dialect = process.argv[2]
 
-const post = require("./entities/Post");
+const post = require("./entities/post/Post");
 const category = require("./entities/Category");
 const { Blog: blog, Author: author} = require("./entities/Blog");
 
