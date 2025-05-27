@@ -18,7 +18,8 @@ y.command(
       type: "array",
       string: true,
       demandOption: true,
-      describe: "Paths (or glob patterns) to folders containing model files, e.g. ./models or ./src/**/entities",
+      describe:
+        "Paths (or glob patterns) to folders containing model files, e.g. ./models or ./src/**/entities",
     },
     dialect: {
       type: "string",
