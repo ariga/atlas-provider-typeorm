@@ -18,7 +18,6 @@ data "external_schema" "typeorm" {
     "load",
     "--path", "./entities/**",
     "--dialect", var.dialect,
-    "--includeSubdirs"
   ]
 }
 
