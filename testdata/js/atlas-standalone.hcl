@@ -16,7 +16,7 @@ data "external_schema" "typeorm" {
     "npx",
     "../..",
     "load",
-    "--path", "./entities",
+    "--path", "./entities/**",
     "--dialect", var.dialect,
     "--includeSubdirs"
   ]

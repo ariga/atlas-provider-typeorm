@@ -15,9 +15,10 @@ y.command(
   "load sql state of typeorm entities",
   {
     path: {
-      type: "string",
+      type: "array",
+      string: true,
       demandOption: true,
-      describe: "Path to models folder",
+      describe: "Paths (or glob patterns) to folders containing model files, e.g. ./models or ./src/**/entities",
     },
     dialect: {
       type: "string",
@@ -25,22 +26,18 @@ y.command(
       demandOption: true,
       describe: "Dialect of database",
     },
-    includeSubdirs: {
-      type: "boolean",
-      default: false,
-      describe: "Whether to include all subfolders when resolving entity files",
-    },
   },
   async function (argv) {
     try {
-      const path = argv.path;
-      if (!fs.existsSync(path)) {
-        throw new Error(`path ${path} does not exist`);
+      const paths = argv.path;
+      for (const path of paths) {
+        const base = path.split("*")[0]; // extract static part
+        if (!fs.existsSync(base)) {
+          throw new Error(`path ${base} does not exist`);
+        }
       }
-      const pattern = argv.includeSubdirs
-        ? `${argv.path}/**/*.{ts,js}`
-        : `${argv.path}/*.{ts,js}`;
-      const sql = await loadEntities(argv.dialect as Dialect, [pattern]);
+      const patterns = paths.map((dir) => `${dir}/*.{ts,js}`);
+      const sql = await loadEntities(argv.dialect as Dialect, patterns);
       console.log(sql);
     } catch (e) {
       if (e instanceof Error) {
