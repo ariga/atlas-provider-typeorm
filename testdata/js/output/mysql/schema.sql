@@ -1,7 +1,7 @@
 -- atlas:pos author[type=table] entities/blog/Author.js:1:16-10:2
 -- atlas:pos blog[type=table] entities/Blog.js:2:21-11:2
 -- atlas:pos category[type=table] entities/Category.js:2:35-14:2
--- atlas:pos post[type=table] entities/Post.js:2:21-25:2
+-- atlas:pos post[type=table] entities/post/Post.js:2:21-25:2
 
 CREATE TABLE `post` (`id` int NOT NULL AUTO_INCREMENT, `title` varchar(255) NOT NULL, `text` text NOT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB;
 CREATE TABLE `category` (`id` int NOT NULL AUTO_INCREMENT, `name` varchar(255) NOT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB;
