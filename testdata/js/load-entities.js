@@ -1,14 +1,14 @@
 #! /usr/bin/env node
 
 const loadEntities = require("../../build/load").loadEntities;
-const EntitySchema = require("typeorm").EntitySchema;
 
 // parse the second argument as the dialect
 const dialect = process.argv[2]
 
-const post = new EntitySchema(require("./entities/Post"));
-const category = new EntitySchema(require("./entities/Category"));
+const post = require("./entities/Post");
+const category = require("./entities/Category");
+const { Blog: blog, Author: author} = require("./entities/Blog");
 
-loadEntities(dialect, [post, category]).then((sql) => {
+loadEntities(dialect, [post, category, blog, author]).then((sql) => {
   console.log(sql);
 });
