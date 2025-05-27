@@ -38,8 +38,8 @@ y.command(
         throw new Error(`path ${path} does not exist`);
       }
       const pattern = argv.includeSubdirs
-          ? `${argv.path}/**/*.{ts,js}`
-          : `${argv.path}/*.{ts,js}`;
+        ? `${argv.path}/**/*.{ts,js}`
+        : `${argv.path}/*.{ts,js}`;
       const sql = await loadEntities(argv.dialect as Dialect, [pattern]);
       console.log(sql);
     } catch (e) {
