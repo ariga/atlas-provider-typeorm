@@ -1,4 +1,5 @@
-module.exports = {
+const {EntitySchema} = require("typeorm");
+const PostOptions = {
     name: "Post",
     columns: {
         id: {
@@ -22,3 +23,4 @@ module.exports = {
         }
     }
 };
+module.exports = new EntitySchema(PostOptions);

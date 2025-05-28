@@ -1,3 +1,13 @@
+-- Create "author" table
+CREATE TABLE `author` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  PRIMARY KEY (`id`)
+) CHARSET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+-- Create "blog" table
+CREATE TABLE `blog` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  PRIMARY KEY (`id`)
+) CHARSET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
 -- Create "post" table
 CREATE TABLE `post` (
   `id` int NOT NULL AUTO_INCREMENT,

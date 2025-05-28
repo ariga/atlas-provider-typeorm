@@ -1,4 +1,5 @@
-module.exports = {
+const {EntitySchema} = require("typeorm");
+module.exports = new EntitySchema({
     name: "Category",
     columns: {
         id: {
@@ -10,4 +11,4 @@ module.exports = {
             type: "varchar"
         }
     }
-};
+});

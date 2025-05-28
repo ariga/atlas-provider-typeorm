@@ -1,3 +1,13 @@
+-- Create "author" table
+CREATE TABLE [author] (
+  [id] int IDENTITY (1, 1) NOT NULL,
+  CONSTRAINT [PK_5a0e79799d372fe56f2f3fa6871] PRIMARY KEY CLUSTERED ([id] ASC)
+);
+-- Create "blog" table
+CREATE TABLE [blog] (
+  [id] int IDENTITY (1, 1) NOT NULL,
+  CONSTRAINT [PK_85c6532ad065a448e9de7638571] PRIMARY KEY CLUSTERED ([id] ASC)
+);
 -- Create "post" table
 CREATE TABLE [post] (
   [id] int IDENTITY (1, 1) NOT NULL,

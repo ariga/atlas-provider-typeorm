@@ -10,17 +10,21 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.loadEntities = loadEntities;
-const path = require("path");
-const ts_morph_1 = require("ts-morph");
+const fs = require("fs");
+const pathModule = require("path");
+const parser_1 = require("@babel/parser");
+const traverse_1 = require("@babel/traverse");
 const typeorm_1 = require("typeorm");
 const ConnectionMetadataBuilder_1 = require("typeorm/connection/ConnectionMetadataBuilder");
 const EntityMetadataValidator_1 = require("typeorm/metadata-builder/EntityMetadataValidator");
 const View_1 = require("typeorm/schema-builder/view/View");
+const StringUtils_1 = require("typeorm/util/StringUtils");
 // Load typeorm entities and return SQL statements describing the schema of the entities.
 function loadEntities(dialect, 
 // eslint-disable-next-line @typescript-eslint/ban-types
 entities) {
     return __awaiter(this, void 0, void 0, function* () {
+        var _a, _b, _c, _d, _e;
         const mockDB = new typeorm_1.DataSource({
             type: dialect,
             database: ":memory:",
@@ -80,53 +84,227 @@ entities) {
             const view = View_1.View.create(metadata, driver);
             yield queryRunner.createView(view, false);
         }
-        // Get line:column range of a class in a file using ts-morph
-        function getEntityPositionWithRange(filePath, className) {
+        // Find the file path of the entity class or EntitySchema options
+        const findObjectFilePath = (obj) => {
+            return Object.keys(require.cache).find((p) => {
+                const cached = require.cache[p];
+                if (!cached || typeof cached.exports !== "object" || !cached.exports)
+                    return false;
+                if (cached.exports === obj) {
+                    return true;
+                }
+                return Object.values(cached.exports).some((v) => v === obj);
+            });
+        };
+        // Extract EntitySchema options from the entry file
+        function extractEntityOptionsFromEntryFile(tableType, tableName) {
+            var _a;
             try {
-                const project = new ts_morph_1.Project({
-                    compilerOptions: { allowJs: true },
-                    skipAddingFilesFromTsConfig: true,
+                const entryFile = (_a = require.main) === null || _a === void 0 ? void 0 : _a.filename;
+                if (!entryFile)
+                    return undefined;
+                const code = fs.readFileSync(entryFile, "utf-8");
+                const ast = (0, parser_1.parse)(code, { sourceType: "module" });
+                let options;
+                (0, traverse_1.default)(ast, {
+                    NewExpression(path) {
+                        const node = path.node;
+                        if (node.callee.type === "Identifier" &&
+                            node.callee.name === "EntitySchema" &&
+                            node.arguments.length === 1) {
+                            const arg = node.arguments[0];
+                            // Inline object
+                            if (arg.type === "ObjectExpression") {
+                                const props = arg.properties;
+                                const hasName = () => {
+                                    let nameValue;
+                                    let tableNameValue;
+                                    for (const prop of props) {
+                                        if (prop.type === "ObjectProperty" &&
+                                            prop.key.type === "Identifier" &&
+                                            prop.value.type === "StringLiteral") {
+                                            if (prop.key.name === "tableName") {
+                                                tableNameValue = prop.value.value;
+                                            }
+                                            else if (prop.key.name === "name") {
+                                                nameValue = prop.value.value;
+                                            }
+                                        }
+                                    }
+                                    return tableNameValue
+                                        ? tableNameValue === tableName
+                                        : nameValue === tableName;
+                                };
+                                if (hasName) {
+                                    options = eval(`(${code.slice(arg.start, arg.end)})`);
+                                    path.stop();
+                                }
+                            }
+                            // Require expression
+                            if (arg.type === "CallExpression" &&
+                                arg.callee.type === "Identifier" &&
+                                arg.callee.name === "require" &&
+                                arg.arguments.length === 1 &&
+                                arg.arguments[0].type === "StringLiteral") {
+                                const importPath = arg.arguments[0].value;
+                                const absPath = pathModule.resolve(pathModule.dirname(entryFile), importPath);
+                                // eslint-disable-next-line @typescript-eslint/no-var-requires
+                                const resolved = require(absPath);
+                                if ((resolved.type || "regular") === tableType && resolved.tableName
+                                    ? resolved.tableName === tableName
+                                    : (0, StringUtils_1.snakeCase)(resolved.name) === tableName) {
+                                    options = resolved;
+                                    path.stop();
+                                }
+                            }
+                        }
+                    },
                 });
-                const sourceFile = project.addSourceFileAtPath(filePath);
-                if (!sourceFile)
-                    return undefined;
-                const cls = sourceFile.getClass(className);
-                if (!cls)
-                    return undefined;
-                const nameNode = cls.getNameNode();
-                if (!nameNode)
-                    return undefined;
-                const startPos = nameNode.getPos();
-                const endPos = cls.getEnd();
-                const start = sourceFile.getLineAndColumnAtPos(startPos);
-                const end = sourceFile.getLineAndColumnAtPos(endPos);
-                return `${filePath}:${start.line}:${start.column}-${end.line}:${end.column}`;
+                return options;
+            }
+            catch (_b) {
+                return undefined;
+            }
+        }
+        // Find the position of the entity class in the file
+        const findEntityClassPos = (filePath, className) => {
+            try {
+                const code = fs.readFileSync(filePath, "utf-8");
+                const ast = (0, parser_1.parse)(code, {
+                    sourceType: "module",
+                    plugins: ["typescript", "decorators-legacy"],
+                });
+                let pos;
+                (0, traverse_1.default)(ast, {
+                    ClassDeclaration(path) {
+                        var _a;
+                        const node = path.node;
+                        if (((_a = node.id) === null || _a === void 0 ? void 0 : _a.name) === className && node.loc) {
+                            pos = `${filePath}:${node.loc.start.line}:${node.loc.start.column + 1}-${node.loc.end.line}:${node.loc.end.column + 1}`;
+                            path.stop();
+                        }
+                    },
+                });
+                return pos;
             }
             catch (_a) {
                 return undefined;
             }
-        }
+        };
+        // Find the position of the EntitySchema options in the file
+        const findEntityOptionsPos = (filePath, entityOptions) => {
+            try {
+                const code = fs.readFileSync(filePath, "utf-8");
+                const ast = (0, parser_1.parse)(code, { sourceType: "module" });
+                let pos;
+                (0, traverse_1.default)(ast, {
+                    ObjectExpression(path) {
+                        const node = path.node;
+                        if (node.properties.some((prop) => prop.type === "ObjectProperty" &&
+                            prop.key.type === "Identifier" &&
+                            (prop.key.name === "name" ||
+                                prop.key.name === "tableName" ||
+                                prop.key.name === "type") &&
+                            prop.value.type === "StringLiteral")) {
+                            let nameValue;
+                            let tableNameValue;
+                            let typeValue;
+                            for (const prop of node.properties) {
+                                if (prop.type === "ObjectProperty" &&
+                                    prop.key.type === "Identifier" &&
+                                    prop.value.type === "StringLiteral") {
+                                    if (prop.key.name === "name")
+                                        nameValue = prop.value.value;
+                                    if (prop.key.name === "tableName")
+                                        tableNameValue = prop.value.value;
+                                    if (prop.key.name === "type")
+                                        typeValue = prop.value.value;
+                                }
+                            }
+                            if (typeValue === entityOptions.type &&
+                                tableNameValue === entityOptions.tableName &&
+                                nameValue === entityOptions.name &&
+                                node.loc) {
+                                pos = `${filePath}:${node.loc.start.line}:${node.loc.start.column + 1}-${node.loc.end.line}:${node.loc.end.column + 1}`;
+                                path.stop();
+                            }
+                        }
+                    },
+                });
+                return pos;
+            }
+            catch (_a) {
+                return undefined;
+            }
+        };
         // Build atlas:pos directives
         const directives = [];
         for (const metadata of entityMetadatas) {
-            const type = metadata.tableType === "view" ? "view" : "table";
+            if (metadata.tableType !== "regular" && metadata.tableType !== "view") {
+                continue;
+            }
+            const type = metadata.tableType == "regular" ? "table" : "view";
             const name = metadata.tableName;
             const target = metadata.target;
-            const filePath = Object.keys(require.cache).find((p) => {
-                const cached = require.cache[p];
-                if (!cached || typeof cached.exports !== "object" || !cached.exports)
-                    return false;
-                return Object.values(cached.exports).includes(target);
-            });
-            if (!filePath)
+            let filePath = (_a = require.main) === null || _a === void 0 ? void 0 : _a.filename;
+            let entityOptions;
+            if (typeof target === "function") {
+                filePath = findObjectFilePath(target);
+            }
+            else {
+                // Find the file path of the EntitySchema by checking require.cache and looking for the EntitySchema options.
+                for (const p of Object.keys(require.cache)) {
+                    const cached = require.cache[p];
+                    if (!cached || typeof cached.exports !== "object" || !cached.exports)
+                        continue;
+                    const exported = cached.exports;
+                    if (((_b = exported === null || exported === void 0 ? void 0 : exported.constructor) === null || _b === void 0 ? void 0 : _b.name) === "EntitySchema" &&
+                        ((_c = exported === null || exported === void 0 ? void 0 : exported.options) === null || _c === void 0 ? void 0 : _c.name) === target) {
+                        filePath = p;
+                        entityOptions = exported.options;
+                        break;
+                    }
+                    for (const v of Object.values(exported)) {
+                        if (((_d = v === null || v === void 0 ? void 0 : v.constructor) === null || _d === void 0 ? void 0 : _d.name) === "EntitySchema" &&
+                            ((_e = v === null || v === void 0 ? void 0 : v.options) === null || _e === void 0 ? void 0 : _e.name) === target) {
+                            filePath = p;
+                            entityOptions = v.options;
+                            break;
+                        }
+                    }
+                    if (entityOptions) {
+                        break;
+                    }
+                }
+                // If not found in require.cache, try to extract from the entry file
+                if (!entityOptions) {
+                    entityOptions = extractEntityOptionsFromEntryFile(metadata.tableType, metadata.tableName);
+                }
+                // Find the file path of the EntitySchema options
+                if (entityOptions) {
+                    const optionsObjectFilePath = findObjectFilePath(entityOptions);
+                    if (optionsObjectFilePath) {
+                        filePath = optionsObjectFilePath;
+                    }
+                }
+            }
+            if (!filePath) {
                 continue;
-            const relative = path.relative(process.cwd(), filePath);
+            }
+            const relative = pathModule.relative(process.cwd(), filePath);
             let pos = relative;
             if (typeof target === "function") {
-                const className = target.name;
-                const fullPos = getEntityPositionWithRange(filePath, className);
-                if (fullPos) {
-                    pos = fullPos.replace(filePath, relative);
+                const classPos = findEntityClassPos(filePath, target.name);
+                if (classPos) {
+                    pos = classPos.replace(filePath, relative);
+                }
+            }
+            else {
+                if (entityOptions) {
+                    const optionsPos = findEntityOptionsPos(filePath, entityOptions);
+                    if (optionsPos) {
+                        pos = optionsPos.replace(filePath, relative);
+                    }
                 }
             }
             directives.push(`-- atlas:pos ${name}[type=${type}] ${pos}`);
