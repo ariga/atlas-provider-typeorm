@@ -2,11 +2,18 @@
 
 ![CI](https://github.com/ariga/atlas-provider-typeorm/actions/workflows/ci.yaml/badge.svg)
 
-Load [TypeORM](https://typeorm.io/) entities into an [Atlas](https://atlasgo.io) project.
+Use [Atlas](https://atlasgo.io/) with [TypeORM](https://typeorm.io/) to manage your database schema as code. By connecting your TypeORM models to Atlas,
+you can define and edit your schema directly in TypeScript or JavaScript. Atlas will then automatically plan and apply database schema migrations for you, 
+eliminating the need to write migrations manually.
 
-## Use-cases
-1. **Declarative migrations** - use a Terraform-like `atlas schema apply --env typeorm` to apply your TypeORM entities to the database.
-2. **Automatic migration planning** - use `atlas migrate diff --env typeorm` to automatically plan a migration from the current database version to the TypeORM schema.
+Atlas brings automated CI/CD workflows to your database, along with built-in support for [testing](https://atlasgo.io/testing/schema), [linting](https://atlasgo.io/versioned/lint),
+schema [drift detection](https://atlasgo.io/monitoring/drift-detection), and [schema monitoring](https://atlasgo.io/monitoring). It also allows you to extend TypeORM with advanced 
+database objects such as triggers, row-level security, and custom functions that are not supported natively.
+
+### Use-cases
+1. [**Declarative migrations**](https://atlasgo.io/declarative/apply) - Use the Terraform-like `atlas schema apply --env typeorm` command to apply your TypeORM schema to the database.
+2. [**Automatic migration planning**](https://atlasgo.io/versioned/diff) - Use `atlas migrate diff --env typeorm` to automatically plan database schema changes and generate
+   a migration from the current database version to the desired version defined by your TypeORM schema.
 
 ## Installation
 
