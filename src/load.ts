@@ -348,19 +348,12 @@ export async function loadEntities(
     if (!filePath) {
       continue;
     }
-    const relative = pathModule.relative(process.cwd(), filePath);
-    let pos = relative;
+    let pos = filePath;
     if (typeof target === "function") {
-      const classPos = findEntityClassPos(filePath, target.name);
-      if (classPos) {
-        pos = classPos.replace(filePath, relative);
-      }
+      pos = findEntityClassPos(filePath, target.name);
     } else {
       if (entityOptions) {
-        const optionsPos = findEntityOptionsPos(filePath, entityOptions);
-        if (optionsPos) {
-          pos = optionsPos.replace(filePath, relative);
-        }
+        pos = findEntityOptionsPos(filePath, entityOptions);
       }
     }
     directives.push(`-- atlas:pos ${name}[type=${type}] ${pos}`);
