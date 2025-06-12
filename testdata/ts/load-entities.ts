@@ -14,15 +14,15 @@ const dialect = process.argv[2] as Dialect;
 // sqlite does not support enum, so we need to load different entities
 if (dialect === "sqlite") {
   loadEntities(dialect, [SqliteUser, SqliteBlog]).then((sql) => {
-    console.log(sql);
+    console.log(sql.split(process.cwd()).join("[ABS_PATH]"));
   });
 } else if (dialect === "mssql") {
   loadEntities(dialect, [MssqlUser, MssqlBlog]).then((sql) => {
-    console.log(sql);
+    console.log(sql.split(process.cwd()).join("[ABS_PATH]"));
   });
 } else {
   // print sql after promise is resolver
   loadEntities(dialect, [User, Blog]).then((sql) => {
-    console.log(sql);
+    console.log(sql.split(process.cwd()).join("[ABS_PATH]"));
   });
 }

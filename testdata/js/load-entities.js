@@ -10,5 +10,5 @@ const category = require("./entities/Category");
 const { Blog: blog, Author: author} = require("./entities/Blog");
 
 loadEntities(dialect, [post, category, blog, author]).then((sql) => {
-  console.log(sql);
+  console.log(sql.replaceAll(process.cwd(), "[ABS_PATH]"));
 });

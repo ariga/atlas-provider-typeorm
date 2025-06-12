@@ -1,7 +1,7 @@
--- atlas:pos author[type=table] entities/blog/Author.js:1:16-10:2
--- atlas:pos blog[type=table] entities/Blog.js:2:21-11:2
--- atlas:pos category[type=table] entities/Category.js:2:35-14:2
--- atlas:pos post[type=table] entities/post/Post.js:2:21-25:2
+-- atlas:pos author[type=table] [ABS_PATH]/entities/blog/Author.js:1:16-10:2
+-- atlas:pos blog[type=table] [ABS_PATH]/entities/Blog.js:2:21-11:2
+-- atlas:pos category[type=table] [ABS_PATH]/entities/Category.js:2:35-14:2
+-- atlas:pos post[type=table] [ABS_PATH]/entities/post/Post.js:2:21-25:2
 
 CREATE TABLE "post" ("id" SERIAL NOT NULL, "title" character varying NOT NULL, "text" text NOT NULL, CONSTRAINT "PK_be5fda3aac270b134ff9c21cdee" PRIMARY KEY ("id"));
 CREATE TABLE "category" ("id" SERIAL NOT NULL, "name" character varying NOT NULL, CONSTRAINT "PK_9c4e4a89e3674fc9f382d733f03" PRIMARY KEY ("id"));

@@ -1,5 +1,5 @@
--- atlas:pos blog[type=table] entities/sqlite/Blog.ts:4:1-14:2
--- atlas:pos user[type=table] entities/sqlite/User.ts:12:1-31:2
+-- atlas:pos blog[type=table] [ABS_PATH]/entities/sqlite/Blog.ts:4:1-14:2
+-- atlas:pos user[type=table] [ABS_PATH]/entities/sqlite/User.ts:12:1-31:2
 
 CREATE TABLE "user" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "firstName" varchar NOT NULL, "lastName" varchar NOT NULL, "age" integer NOT NULL, CONSTRAINT "UQ_c322cd2084cd4b1b2813a900320" UNIQUE ("firstName", "lastName"), CONSTRAINT "CHK_70c8a9c9c39b98f399c28b8700" CHECK ("age" > 6));
 CREATE INDEX "IDX_USER_AGE" ON "user" ("age") ;
