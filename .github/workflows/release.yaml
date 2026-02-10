@@ -8,30 +8,34 @@ on:
         required: false
   push:
     tags:
-      - 'v*.*.*'
-
+      - "v*.*.*"
 jobs:
   npm-publish:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write # Required for OIDC
+      contents: read
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 22.14.0
+          node-version: 24.13.0
+          registry-url: "https://registry.npmjs.org"
       - name: Set version env
         id: set_version
         ## if version is not provided as input, use the tag name
         run: |
           echo "tag=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
           if [ -z "${{ github.event.inputs.version }}" ]; then
-              echo "tag=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+            echo "tag=${{ github.ref_name }}" >> $GITHUB_OUTPUT
           fi
       - name: Update version of npm package
         env:
           RELEASE_VERSION: ${{ steps.set_version.outputs.tag }}
         run: |
-          npm version $RELEASE_VERSION --no-git-tag-version
+          npm version $RELEASE_VERSION
       - name: publish the npm package
-        uses: JS-DevTools/npm-publish@v2
-        with:
-          token: ${{ secrets.NPM_TOKEN }}
+        working-directory: ./${{ matrix.language }}
+        run:
+          # https://github.com/actions/setup-node/issues/1440#issuecomment-3571890875
+          NODE_AUTH_TOKEN="" npm publish
