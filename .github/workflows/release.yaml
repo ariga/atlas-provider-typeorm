@@ -33,7 +33,7 @@ jobs:
         env:
           RELEASE_VERSION: ${{ steps.set_version.outputs.tag }}
         run: |
-          npm version $RELEASE_VERSION
+          npm version $RELEASE_VERSION --no-git-tag-version
       - name: publish the npm package
         working-directory: ./${{ matrix.language }}
         run:
